@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./costumer-client-backend
+      dockerfile: Dockerfile
+    container_name: costumer-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./costumer-client-backend:/app
+      - /app/node_modules 
+    environment:
+      DATABASE_URL: mysql://costumer_user:costumer_pass@mysql_db:3306/db_costumer
+      PORT: 3000
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    command: >
+      bash -c "npx prisma migrate deploy --schema ./prisma/schema.prisma && npx prisma generate --schema ./prisma/schema.prisma && npm run start:dev"
+
+  frontend:
+    build:
+      context: ./costumer-client-frontend
+      dockerfile: Dockerfile
+    container_name: costumer-frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend 
+    volumes:
+      - ./costumer-client-frontend:/app
+      - /app/node_modules
+
+  mysql_db:
+    image: mysql:8.0
+    container_name: costumer-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root 
+      MYSQL_DATABASE: db_costumer
+      MYSQL_USER: costumer_user 
+      MYSQL_PASSWORD: costumer_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password 
+    healthcheck: 
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 30s 
+
+volumes:
+  mysql_data:
+    driver: local

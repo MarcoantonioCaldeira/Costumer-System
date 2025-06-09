@@ -1,0 +1,57 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <div class="bg-white p-8 rounded-md shadow-sm w-full max-w-2xl border border-gray-200">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create New Order</h1>
+
+    <div *ngIf="errorMessage" class="text-center text-red-500 text-base my-4">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Order Items</h2>
+      <div formArrayName="items" class="space-y-4 mb-6">
+        <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-row bg-gray-50 p-4 rounded-md border border-gray-200 flex flex-col md:flex-row md:items-end md:space-x-4 space-y-4 md:space-y-0">
+          <div class="form-group flex-1">
+            <label class="block text-gray-700 text-sm font-medium mb-1">Product:</label>
+            <select formControlName="productId"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700 bg-white text-base">
+              <option value="" disabled selected>Select a product</option>
+              <option *ngFor="let product of products" [value]="product.id">
+                {{ product.name }} - ${{ product.price | number:'1.2-2' }}
+              </option>
+            </select>
+            <div *ngIf="item.get('productId')?.invalid && item.get('productId')?.touched" class="text-red-500 text-xs mt-1">
+              Product is mandatory
+            </div>
+          </div>
+
+          <div class="form-group w-full md:w-auto">
+            <label class="block text-gray-700 text-sm font-medium mb-1">Amount:</label>
+            <input type="number" formControlName="quantity" min="1"
+                   class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700 bg-white text-base">
+            <div *ngIf="item.get('quantity')?.invalid && item.get('quantity')?.touched" class="text-red-500 text-xs mt-1">       
+              Quantity must be at least 1
+            </div>
+          </div>
+
+          <button type="button" (click)="removeItem(i)"
+                  class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 ease-in-out"
+                  [disabled]="items.length <= 1">
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
+        <button type="button" (click)="addItem()"
+                class="border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 ease-in-out">
+          Add Product
+        </button>
+        <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out"
+                [disabled]="orderForm.invalid || isLoading">
+          {{ isLoading ? 'Creating...' : 'Create Order' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

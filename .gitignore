@@ -1,0 +1,21 @@
+# Node modules
+costumer-client-backend/node_modules/
+costumer-client-frontend/node_modules/
+
+# Build artifacts
+costumer-client-backend/dist/
+costumer-client-frontend/dist/
+
+# Environment variables
+costumer-client-backend/.env
+costumer-client-frontend/.env
+
+# Prisma generated client
+costumer-client-backend/prisma/generated/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

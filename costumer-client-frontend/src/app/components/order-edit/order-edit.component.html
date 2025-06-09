@@ -1,0 +1,65 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <div class="bg-white p-8 rounded-md shadow-sm w-full max-w-lg border border-gray-200">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+      Editar Status do Pedido
+    </h2>
+
+    <div *ngIf="isLoading" class="text-center text-gray-600 text-base my-4">
+      Carregando pedido...
+    </div>
+    <div *ngIf="errorMessage" class="text-center text-red-500 text-base my-4">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && order">
+      <form [formGroup]="orderEditForm" (ngSubmit)="onSubmit()">
+        <div class="mb-5">
+          <label class="block text-gray-700 text-sm font-medium mb-1">
+            Status Atual: <strong class="text-blue-600 font-semibold">{{ order.status | titlecase }}</strong>
+          </label>
+        </div>
+
+        <div class="mb-6">
+          <label for="status" class="block text-gray-700 text-sm font-medium mb-1">
+            Novo Status:
+          </label>
+          <select
+            id="status"
+            formControlName="status"
+            class="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700 bg-white text-base"
+          >
+            <option value="" disabled selected>Selecione um status</option> <option *ngFor="let status of statusOptions" [value]="status">{{ status | titlecase }}</option>
+          </select>
+          <div
+            *ngIf="orderEditForm.get('status')?.invalid && orderEditForm.get('status')?.touched"
+            class="text-red-500 text-xs mt-1"
+          >
+            Por favor, selecione um status.
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
+          <button
+            type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out"
+            [disabled]="orderEditForm.invalid || isLoading"
+          >
+            <span *ngIf="isLoading">Atualizando...</span>
+            <span *ngIf="!isLoading">Salvar Alterações</span>
+          </button>
+          <button
+            type="button"
+            class="border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300 transition duration-200 ease-in-out"
+            (click)="router.navigate(['/dashboard/orders'])"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && !order && orderId" class="text-center text-gray-600 text-base my-4">
+      <p>Pedido não encontrado ou ocorreu um problema ao carregar.</p>
+    </div>
+  </div>
+</div>
